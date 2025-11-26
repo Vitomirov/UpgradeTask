@@ -29,7 +29,7 @@ app.use('/api/purchases', purchaseRoutes); // POST /api/purchases
 
 // Health check
 app.get('/api/health', (req, res) => {
-    res.status(200).json({ status: 'ok', service: 'MLM Bonus API' });
+    res.status(200).json({ status: 'ok', service: 'Upgrade Task' });
 });
 
 // Main application function

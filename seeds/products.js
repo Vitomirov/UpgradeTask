@@ -2,9 +2,9 @@ export async function seed(knex) {
   // NOTE: This seed file adds two initial products to the 'products' table.
   
   // Deletes ALL existing entries in the 'products' table to ensure idempotency
-  await knex('products').del(); 
+  await knex.raw('TRUNCATE TABLE products RESTART IDENTITY CASCADE');
 
-  // Inserts seed entries
+  // Seed products
   await knex('products').insert([
     { 
       id: 1, 

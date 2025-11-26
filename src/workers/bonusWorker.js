@@ -1,76 +1,49 @@
 const KnexService = require('../services/KnexService');
 const { WORKER_INTERVAL_MS } = require('../config/constants');
 
-// Centralized logic for periodically processing delayed bonus payouts.
 class BonusWorker {
     constructor() {
-        // Interval is set in constants.js (default 60000ms = 1 minute)
-        this.interval = WORKER_INTERVAL_MS;
+        this.interval = WORKER_INTERVAL_MS || 60000;
         this.isRunning = false;
         this.timer = null;
     }
 
-    // Main worker logic: finds and pays bonuses.
     async process() {
-        if (this.isRunning) {
-            console.log('Worker is currently processing. Skipping this interval.');
-            return;
-        }
-
+        if (this.isRunning) return;
         this.isRunning = true;
-        
+
         try {
-            // 1. Get all pending bonuses that are past their scheduled_at time
+            await KnexService.testConnection();
             const bonusesToPay = await KnexService.getPendingBonusesToPay();
+            if (!bonusesToPay.length) return;
 
-            if (bonusesToPay.length === 0) {
-                // console.log('Bonus Worker: No pending bonuses to pay.');
-                this.isRunning = false;
-                return;
-            }
-
-            console.log(`Bonus Worker found ${bonusesToPay.length} bonuses to pay.`);
-
-            // Extract IDs for bulk update
             const bonusIds = bonusesToPay.map(b => b.id);
-
-            // 2. Mark all found bonuses as 'paid' in a single transaction
             await KnexService.markBonusesAsPaid(bonusIds);
-            
-            console.log(`Bonus Worker successfully paid ${bonusesToPay.length} team bonuses.`);
 
-        } catch (error) {
-            console.error(' Failed Bonus Worker processing:', error);
+            console.log(`Bonus Worker: successfully paid ${bonusesToPay.length} bonuses: [${bonusIds.join(', ')}]`);
+        } catch (err) {
+            if (err.message.includes('DB not ready')) {
+                console.log('Bonus Worker: DB not ready, retrying in 1s...');
+                setTimeout(() => this.process(), 1000);
+            } else {
+                console.error('Bonus Worker processing failed:', err);
+            }
         } finally {
             this.isRunning = false;
         }
     }
 
-    // Starts the periodic worker process.
-// Starts the periodic worker process.
-start() {
-    if (this.timer) {
-        return;
+    start() {
+        if (this.timer) return;
+
+        const startupDelay = 5000;
+        setTimeout(() => {
+            this.process();
+            this.timer = setInterval(() => this.process(), this.interval);
+            console.log(`Bonus Worker started, running every ${this.interval / 1000}s.`);
+        }, startupDelay);
     }
 
-    // Delay startup to ensure DB is ready
-    const startupDelayMs = 5000;
-
-    setTimeout(() => {
-        // Run immediately after delay
-        this.process();
-
-        // Set up periodic interval
-        this.timer = setInterval(() => {
-            this.process();
-        }, this.interval);
-
-        console.log(`Bonus Worker started. Running every ${this.interval / 1000} seconds.`);
-    }, startupDelayMs);
-}
-
-
-    // Stops the worker process.
     stop() {
         if (this.timer) {
             clearInterval(this.timer);
