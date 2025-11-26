@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 
 // Database initialization and connection check
 const { checkDbConnection } = require('./src/db/db');
@@ -19,36 +18,38 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 // Middleware setup
-app.use(bodyParser.json()); // To support JSON-encoded bodies
-app.use(bodyParser.urlencoded({ extended: true })); // To support URL-encoded bodies
+app.use(express.json()); // JSON-encoded bodies
+app.use(express.urlencoded({ extended: true })); // URL-encoded bodies
 
 // ===================================
 // API ROUTES
 // ===================================
+app.use('/api/users', userRoutes);       // POST /api/users, GET /api/users/:id
+app.use('/api/purchases', purchaseRoutes); // POST /api/purchases
 
-// User routes: handles POST /api/users and GET /api/users/:id
-app.use('/api/users', userRoutes);
-// Purchase routes: handles POST /api/purchases
-app.use('/api/purchases', purchaseRoutes);
-
-
-// Basic health check route
+// Health check
 app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'ok', service: 'MLM Bonus API' });
 });
 
-
 // Main application function
 async function startServer() {
-    // 1. Check database connection
-    await checkDbConnection();
+    try {
+        // 1️⃣ Check database connection
+        await checkDbConnection();
+        console.log('Server: Database connection established successfully.');
 
-    // 2. Start the Express server
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-    });
+        // 2️⃣ Start Express server
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
 
-    BonusWorker.start();
+        // 3️⃣ Start bonus worker
+        BonusWorker.start();
+    } catch (err) {
+        console.error('Failed to start server:', err);
+        process.exit(1);
+    }
 }
 
 startServer();

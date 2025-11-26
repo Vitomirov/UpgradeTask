@@ -47,21 +47,28 @@ class BonusWorker {
     }
 
     // Starts the periodic worker process.
-    start() {
-        if (this.timer) {
-            console.warn('Bonus Worker is already running.');
-            return;
-        }
-        
-        // Run immediately on start, then run on interval
+// Starts the periodic worker process.
+start() {
+    if (this.timer) {
+        return;
+    }
+
+    // Delay startup to ensure DB is ready
+    const startupDelayMs = 5000;
+
+    setTimeout(() => {
+        // Run immediately after delay
         this.process();
 
+        // Set up periodic interval
         this.timer = setInterval(() => {
             this.process();
         }, this.interval);
-        
+
         console.log(`Bonus Worker started. Running every ${this.interval / 1000} seconds.`);
-    }
+    }, startupDelayMs);
+}
+
 
     // Stops the worker process.
     stop() {

@@ -1,5 +1,5 @@
 const { db } = require('../db/db');
-const { HIERARCHY_BONUS_LEVELS } = require('../config/constants');
+const { HIERARCHY_BONUS_LEVELS, REFERRAL_BONUS_PERCENTAGE, TEAM_BONUS_PERCENTAGE } = require('../config/constants');
 
 // Centralized Data Access Layer  for all application tables.
 class KnexService {
