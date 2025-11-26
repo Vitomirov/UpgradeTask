@@ -9,33 +9,33 @@ curl -s http://localhost:3000/api/health | jq
 
 # 2️⃣ Create Users
 echo -e "\n2️⃣ Creating Users..."
-ALICE=$(curl -s -X POST http://localhost:3000/api/users \
+MARKO=$(curl -s -X POST http://localhost:3000/api/users \
   -H "Content-Type: application/json" \
-  -d '{"name":"Alice"}')
-echo "Alice created: $ALICE"
-ALICE_ID=$(echo $ALICE | jq '.user.id')
+  -d '{"name":"Marko"}')
+echo "Marko created: $MARKO"
+MARKO_ID=$(echo $MARKO | jq '.user.id')
 
-BOB=$(curl -s -X POST http://localhost:3000/api/users \
+MILAN=$(curl -s -X POST http://localhost:3000/api/users \
   -H "Content-Type: application/json" \
-  -d "{\"name\":\"Bob\",\"referrer_id\":$ALICE_ID}")
-echo "Bob created: $BOB"
-BOB_ID=$(echo $BOB | jq '.user.id')
+  -d "{\"name\":\"Milan\",\"referrer_id\":$MARKO_ID}")
+echo "Milan created: $MILAN"
+MILAN_ID=$(echo $MILAN | jq '.user.id')
 
-CHARLIE=$(curl -s -X POST http://localhost:3000/api/users \
+DEJAN=$(curl -s -X POST http://localhost:3000/api/users \
   -H "Content-Type: application/json" \
-  -d "{\"name\":\"Charlie\",\"referrer_id\":$BOB_ID}")
-echo "Charlie created: $CHARLIE"
-CHARLIE_ID=$(echo $CHARLIE | jq '.user.id')
+  -d "{\"name\":\"Dejan\",\"referrer_id\":$MILAN_ID}")
+echo "Dejan created: $DEJAN"
+DEJAN_ID=$(echo $DEJAN | jq '.user.id')
 
-# 3️⃣ Check Charlie's Upline
-echo -e "\n3️⃣ Checking Charlie's Upline Hierarchy..."
-curl -s http://localhost:3000/api/users/$CHARLIE_ID | jq
+# 3️⃣ Check Dejan's Upline
+echo -e "\n3️⃣ Checking Dejan's Upline Hierarchy..."
+curl -s http://localhost:3000/api/users/$DEJAN_ID | jq
 
-# 4️⃣ Add Purchase for Charlie
-echo -e "\n4️⃣ Adding Purchase for Charlie (product_id=2)..."
+# 4️⃣ Add Purchase for Dejan
+echo -e "\n4️⃣ Adding Purchase for Dejan (product_id=2)..."
 PURCHASE=$(curl -s -X POST http://localhost:3000/api/purchases \
   -H "Content-Type: application/json" \
-  -d "{\"user_id\":$CHARLIE_ID,\"product_id\":2}")
+  -d "{\"user_id\":$DEJAN_ID,\"product_id\":2}")
 echo "Purchase created: $PURCHASE"
 
 # 5️⃣ Check Bonuses Table directly in DB container
