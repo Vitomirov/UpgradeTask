@@ -1,4 +1,4 @@
-export async function up(knex) {
+exports.up = async function(knex) {
     await knex.schema.createTable('users', (table) => {
         table.increments('id').primary();
         table.string('name').notNullable();
@@ -14,8 +14,8 @@ export async function up(knex) {
         
         table.timestamp('created_at').defaultTo(knex.fn.now());
     });
-}
+};
 
-export async function down(knex) {
+exports.down = async function(knex) {
     await knex.schema.dropTableIfExists('users');
-}
+};

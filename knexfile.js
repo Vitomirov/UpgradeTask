@@ -1,22 +1,19 @@
-require('dotenv').config({ path: './.env' }); 
+require('dotenv').config({ path: './.env' });
 
 module.exports = {
-  
   development: {
     client: 'pg',
-    // ENV conection settings for PostgreSQL
     connection: {
-      host: 'localhost',
-      user: process.env.PG_USER,
-      password: process.env.PG_PASSWORD,
-      database: process.env.PG_DATABASE
+      host: process.env.PG_HOST || 'localhost',
+      user: process.env.PG_USER || 'upgrade',
+      password: process.env.PG_PASSWORD || 'upgrade123',
+      database: process.env.PG_DATABASE || 'upgrade_db'
     },
-    // Migration path
+    pool: { min: 2, max: 10 },
     migrations: {
       directory: './migrations',
-      tableName: 'knex_migrations', 
+      tableName: 'knex_migrations'
     },
-    // Seeds path
     seeds: {
       directory: './seeds'
     }
