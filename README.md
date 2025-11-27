@@ -1,115 +1,129 @@
-🚀 MLM Bonus API
-This project implements a simple MLM (Multi-Level Marketing) bonus system. It allows users to invite others, purchase products, and generate direct and team bonuses based on the established hierarchy.
+# 🚀 Upgrade job application test
 
-✨ Features
-Add users to the platform with an optional referrer (referrer_id).
+---
 
-Users can purchase pre-defined products: Package 1 and Package 2.
+## 📚 Table of Contents
 
-Direct bonus (10%) is paid instantly to the inviter.
+- [Features](#-features)
+- [Assumptions](#-assumptions)
+- [Tech Stack](#-tech-stack)
+- [Getting Started](#-getting-started)
+  - [Clone the Repository](#1-clone-the-repository)
+  - [Create an .env File](#2-create-an-env-file)
+  - [Start the Backend Environment](#3-start-the-backend-environment)
+- [Run Integration Tests](#-run-integration-tests)
+- [Team Bonus Worker](#-team-bonus-worker)
 
-Team bonus (5%) is scheduled 1 hour later for all upline members.
+---
 
-PostgreSQL database with migrations and seeds.
+## ✨ Features
 
-Express.js backend API.
+- Add users with optional `referrer_id`
+- Two predefined products:
+  - **Package 1 — $100**
+  - **Package 2 — $500**
+- **10% direct bonus** paid instantly to the inviter
+- **5% team bonus** scheduled exactly 1 hour after purchase
+- PostgreSQL database with migrations and seed data
+- Express.js REST API
+- Integration tests included
 
-Integration tests included.
+---
 
-💡 Assumptions
-No authentication is implemented (open API).
+## 💡 Assumptions
 
-Products are pre-defined in the database:
+- Open API (no authentication)
+- Products are predefined in the database
+- Team bonus delay is exactly **1 min**
+- Database transactions ensure atomicity
 
-Package 1 - $100.00
+---
 
-Package 2 - $500.00
+## 🛠️ Tech Stack
 
-Team bonus delay is exactly 1 hour.
+- Node.js + Express.js  
+- PostgreSQL  
+- Knex.js (migrations, seeds, query builder)  
+- Docker + Docker Compose  
+- Nodemon  
+- Dotenv  
 
-Database transactions ensure atomicity for purchases and bonuses.
+---
 
-🛠️ Tech Stack
-Node.js + Express.js
+# 🏁 Getting Started
 
-PostgreSQL
+## 1. Clone the Repository
 
-Knex.js for query building, migrations, and seeds
-
-Docker + Docker Compose
-
-Nodemon for development
-
-Dotenv for environment variables
-
-🏁 Getting Started
-1. Clone the Repository
-Clone the project and navigate into the directory:
-
-Bash
-
+```bash
 git clone https://github.com/Vitomirov/UpgradeTask
 cd UpgradeTask
-2. Create .env File
-Create a file named .env in the root directory.
+```
 
-Example .env:
+---
 
+## 2. Create an .env File
+
+Create a `.env` file in the project root:
+
+```env
 PG_HOST=db
-PG_USER=upgrade
-PG_PASSWORD=upgrade123
+PG_USER=<your username>
+PG_PASSWORD=<your password>
 PG_DATABASE=upgrade_db
 PORT=3000
-3. Start the Backend Environment
-This script handles setup, migrations, and starting the server using Docker Compose.
+```
 
-Bash
+---
 
+## 3. Start the Backend Environment
+
+This command resets the database, builds Docker images, runs migrations and seeds, and starts the backend server.
+
+```bash
 npm run start
-This script will perform the following actions:
+```
 
-Stop any running containers.
+This script performs:
 
-Remove the old database volume.
+- Stops running containers  
+- Removes old DB volume  
+- Builds Docker images  
+- Starts backend + PostgreSQL  
+- Runs migrations  
+- Seeds initial users and products  
+- Starts backend with Nodemon  
 
-Build Docker images.
+💡 **Bonus Worker runs every 60 seconds** — check logs to see scheduled team bonus processing.
 
-Start containers (backend + Postgres).
+---
 
-Run database migrations.
+# 🧪 Run Integration Tests
 
-Seed products and initial users (Marko, Milan, Dejan).
-
-Start the backend server with Nodemon.
-
-💡 Note: Check the logs to see the Bonus Worker running, which processes team bonuses every 60 seconds.
-
-🧪 Run Integration Test
-Execute the full suite of integration tests:
-
-Bash
-
+```bash
 npm run test
-This test will:
+```
 
-Check the health endpoint.
+The test suite checks:
 
-Create test users with referrals (Marko, Milan, Dejan).
+- Health endpoint  
+- User creation with referral chain  
+- Upline hierarchy  
+- Purchase simulation  
+- Direct & team bonuses  
 
-Verify the upline hierarchy.
+Expected outcome:  
+The `bonuses` table contains correct bonus amounts, statuses, and scheduled times.
 
-Create a purchase.
+---
 
-Check the bonuses table for direct and team bonuses.
+# 📝 Team Bonus Worker
 
-Expected Output: The bonuses table will have the correct amounts, statuses, and scheduled times, confirming the bonus logic works as designed.
+The Team Bonus Worker runs every **60 seconds** and processes all team bonuses whose `scheduled_for` is due.
 
-📝 Notes
-Team Bonus Worker
-The Team Bonus Worker runs every 60 seconds to process pending bonuses (status = pending) that are exactly 1 hour past their purchase time.
+Example output:
 
-Backend logs show bonus processing in real-time:
-
+```
 Bonus Worker started, running every 60s.
 Bonus Worker: found 2 bonuses to pay.
 Bonus Worker: successfully paid 2 bonuses: [1, 2]
+```
