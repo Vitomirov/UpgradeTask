@@ -1,25 +1,19 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Full development reset..."
+echo "🚀 Starting development environment..."
 
-# Stop containers
-echo "🛑 Stopping containers..."
-docker compose down
+# Load env
+export $(grep -v '^#' .env | xargs)
 
-# Remove old DB volume
-echo "🧹 Cleaning old database volume..."
-docker volume rm UpgradeTask_postgres_data 2>/dev/null || true
+# Stop and remove everything
+docker compose down -v
 
-# Build Docker images
-echo "🔧 Building Docker images..."
+# Build and start
 docker compose build
-
-# Start containers
-echo "▶️ Starting containers..."
 docker compose up -d
 
-# Wait until Postgres is healthy
+# Wait for Postgres
 echo "⏳ Waiting for Postgres..."
 until [ "$(docker inspect --format='{{.State.Health.Status}}' upgrade_postgres_db)" == "healthy" ]; do
   sleep 2
@@ -27,14 +21,19 @@ done
 
 echo "✅ Database is ready."
 
-# Run migrations
-echo "📂 Running database migrations..."
-docker compose exec -T backend npx knex migrate:latest
+# Run migrations and seeds
+docker compose exec -T backend env \
+  PG_HOST=$PG_HOST \
+  PG_USER=$PG_USER \
+  PG_PASSWORD=$PG_PASSWORD \
+  PG_DATABASE=$PG_DATABASE \
+  npx knex migrate:latest
 
-# Seed initial data
-echo "🌱 Seeding products and users..."
-docker compose exec -T backend npx knex seed:run
+docker compose exec -T backend env \
+  PG_HOST=$PG_HOST \
+  PG_USER=$PG_USER \
+  PG_PASSWORD=$PG_PASSWORD \
+  PG_DATABASE=$PG_DATABASE \
+  npx knex seed:run
 
-# Start backend logs
-echo "💻 Starting backend server..."
 docker compose logs -f backend
