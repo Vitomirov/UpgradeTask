@@ -1,4 +1,4 @@
-const { db } = require('../db/db'); // <-- koristimo jedinu Knex instancu
+const { db } = require('../db/db');
 const { HIERARCHY_BONUS_LEVELS, REFERRAL_BONUS_PERCENTAGE, TEAM_BONUS_PERCENTAGE } = require('../config/constants');
 
 class KnexService {
@@ -94,7 +94,6 @@ class KnexService {
         return newPurchase;
     }
 
-    // ✅ Koristimo db, ne lokalni knex
     async getPendingBonusesToPay() {
         return db(this.tables.bonuses)
             .where('status', 'pending')

@@ -4,9 +4,8 @@ const knexConfig = require('../../knexfile');
 // Initialize Knex instance using the development configuration.
 const db = knex(knexConfig.development);
 
-/**
- * Checks the database connection health.
- */
+// Checks the database connection health.
+
 async function checkDbConnection() {
     try {
         await db.raw('SELECT 1');

@@ -5,7 +5,7 @@ const { PRODUCT_IDS } = require('../config/constants');
 // Handles purchase and bonus creation logic
 class PurchaseController {
 
-    // POST /api/purchases
+
     // Processes a purchase and triggers bonus payouts.
     async processPurchase(req, res) {
         const { user_id, product_id } = req.body; 
@@ -30,7 +30,6 @@ class PurchaseController {
             }
 
             // Get product price based on ID (assuming fixed initial products)
-
             let productPrice;
             if (prodId === PRODUCT_IDS.PACKAGE_1) {
                 productPrice = PRODUCT_PRICES.PACKAGE_1;

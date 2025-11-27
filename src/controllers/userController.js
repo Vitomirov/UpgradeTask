@@ -1,11 +1,13 @@
 const KnexService = require('../services/KnexService');
 
+// Handles user creation and upline retrieval logic
 class UserController {
 
-
+    // Adds a new user to the platform.
     async addUser(req, res) {
         const { name, referrer_id } = req.body; 
 
+        // 1.Input Validation
         if (!name || typeof name !== 'string') {
             return res.status(400).json({ error: 'Name is required and must be a string.' });
         }
@@ -14,7 +16,7 @@ class UserController {
             if (isNaN(parseInt(referrer_id)) || parseInt(referrer_id) <= 0) {
                 return res.status(400).json({ error: 'Invalid referrer_id.' });
             }
-            
+            //2. Referrer existence check
             const referrer = await KnexService.findUserById(referrer_id);
             if (!referrer) {
                 return res.status(404).json({ error: `Referrer with ID ${referrer_id} not found.` });
@@ -22,6 +24,7 @@ class UserController {
         }
 
         try {
+            //3. Create user in DB
             const newUser = await KnexService.addUser(name, referrer_id);
             
             return res.status(201).json({
@@ -37,7 +40,7 @@ class UserController {
             return res.status(500).json({ error: 'Internal server error while creating user.' });
         }
     }
-
+    // Retrieves user details along with upline hierarchy.
     async getUserDetails(req, res) {
         const userId = parseInt(req.params.id);
 

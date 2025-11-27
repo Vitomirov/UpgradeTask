@@ -1,40 +1,35 @@
-MLM Bonus API
+🚀 MLM Bonus API
+This project implements a simple MLM (Multi-Level Marketing) bonus system. It allows users to invite others, purchase products, and generate direct and team bonuses based on the established hierarchy.
 
-This project implements a simple MLM (Multi-Level Marketing) bonus system.
-Users can invite others, purchase products, and generate direct and team bonuses according to the hierarchy.
+✨ Features
+Add users to the platform with an optional referrer (referrer_id).
 
-Features
+Users can purchase pre-defined products: Package 1 and Package 2.
 
-Add users to the platform with optional referrer (referrer_id)
+Direct bonus (10%) is paid instantly to the inviter.
 
-Users can purchase products (Package 1 and Package 2)
+Team bonus (5%) is scheduled 1 hour later for all upline members.
 
-Direct bonus (10%) is paid instantly to the inviter
+PostgreSQL database with migrations and seeds.
 
-Team bonus (5%) is scheduled 1 hour later for all upline members
+Express.js backend API.
 
-PostgreSQL database with migrations and seeds
+Integration tests included.
 
-Express.js backend API
+💡 Assumptions
+No authentication is implemented (open API).
 
-Integration test included
+Products are pre-defined in the database:
 
-Assumptions
+Package 1 - $100.00
 
-No authentication is implemented (open API)
+Package 2 - $500.00
 
-Products are pre-defined in database:
+Team bonus delay is exactly 1 hour.
 
-Package 1 - 100.00
+Database transactions ensure atomicity for purchases and bonuses.
 
-Package 2 - 500.00
-
-Team bonus delay is exactly 1 hour
-
-Database transactions ensure atomicity for purchases and bonuses
-
-Tech Stack
-
+🛠️ Tech Stack
 Node.js + Express.js
 
 PostgreSQL
@@ -47,12 +42,16 @@ Nodemon for development
 
 Dotenv for environment variables
 
-Getting Started
-1. Clone repository
+🏁 Getting Started
+1. Clone the Repository
+Clone the project and navigate into the directory:
+
+Bash
+
 git clone https://github.com/Vitomirov/UpgradeTask
 cd UpgradeTask
-
-2. Create .env file
+2. Create .env File
+Create a file named .env in the root directory.
 
 Example .env:
 
@@ -61,60 +60,56 @@ PG_USER=upgrade
 PG_PASSWORD=upgrade123
 PG_DATABASE=upgrade_db
 PORT=3000
+3. Start the Backend Environment
+This script handles setup, migrations, and starting the server using Docker Compose.
 
-3. Start the backend with Docker
+Bash
+
 npm run start
+This script will perform the following actions:
 
+Stop any running containers.
 
-This script will:
+Remove the old database volume.
 
-Stop any running containers
+Build Docker images.
 
-Remove old database volume
+Start containers (backend + Postgres).
 
-Build Docker images
+Run database migrations.
 
-Start containers (backend + Postgres)
+Seed products and initial users (Marko, Milan, Dejan).
 
-Run database migrations
+Start the backend server with Nodemon.
 
-Seed products and users (Marko, Milan, Dejan)
+💡 Note: Check the logs to see the Bonus Worker running, which processes team bonuses every 60 seconds.
 
-Start backend server with Nodemon
+🧪 Run Integration Test
+Execute the full suite of integration tests:
 
-Check logs to see the Bonus Worker processing team bonuses every 60 seconds.
+Bash
 
-4. Run Integration Test
 npm run test
+This test will:
 
+Check the health endpoint.
 
-This will:
+Create test users with referrals (Marko, Milan, Dejan).
 
-Check the health endpoint
+Verify the upline hierarchy.
 
-Create test users with referrals (Marko, Milan, Dejan)
+Create a purchase.
 
-Verify upline hierarchy
+Check the bonuses table for direct and team bonuses.
 
-Create a purchase
+Expected Output: The bonuses table will have the correct amounts, statuses, and scheduled times, confirming the bonus logic works as designed.
 
-Check the bonuses table for direct and team bonuses
-
-Expected output: bonuses table will have correct amounts, statuses, and scheduled times.
-
-Notes
-
-Team bonus worker runs every 60 seconds to process pending bonuses (status = pending) exactly 1 hour after purchase.
+📝 Notes
+Team Bonus Worker
+The Team Bonus Worker runs every 60 seconds to process pending bonuses (status = pending) that are exactly 1 hour past their purchase time.
 
 Backend logs show bonus processing in real-time:
 
 Bonus Worker started, running every 60s.
 Bonus Worker: found 2 bonuses to pay.
 Bonus Worker: successfully paid 2 bonuses: [1, 2]
-
-Commands
-# Start environment (Docker + backend + migrations + seeds)
-npm run start
-
-# Run integration test
-npm run test

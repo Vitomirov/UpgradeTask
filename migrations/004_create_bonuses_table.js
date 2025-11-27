@@ -1,6 +1,3 @@
-/**
- * @param { import("knex").Knex } knex
- */
 export async function up(knex) {
   await knex.schema.createTable('bonuses', (table) => {
     table.increments('id').primary();
